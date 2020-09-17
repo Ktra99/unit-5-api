@@ -1,19 +1,31 @@
-//https://stackoverflow.com/questions/43262121/trying-to-use-fetch-and-pass-in-mode-no-cors
-
-let proxy = "https://cors-anywhere.herokuapp.com/";
+let proxy = "https://cors-anywhere.herokuapp.com/"; //https://stackoverflow.com/questions/43262121/trying-to-use-fetch-and-pass-in-mode-no-cors
 let target = "https://randomuser.me/api/?results=12";
 
 const fetchUser = () => {
-	fetch(target)
-	.then(response => response.json())
-	.then(data => createUser(data.results))
+	fetch(target) //fetches the api
+	.then(response => response.json()) //recieve the data as json
+	.then(data => createUser(data.results)) //creates user with the data
 }
 
 const createUser = (users) => {
-	//console.log(users[0].location.city);
 	for (let i = 0; i <= 11; i++) {
+
+		//adding data attribute values contaning info that will be implemented into the modal info section
+		let phone = users[i].phone;
+		let full_address = users[i].location.street.number + " " + users[i].location.street.name + ", " + users[i].location.city + " " + users[i].location.postcode;
+		let date_uncut = users[i].dob.date;
+		let day = date_uncut.substring(8, 10);
+		let month = date_uncut.substring(5, 7);
+		let year = date_uncut.substring(0, 4);
+
+		//generating the card component
+
 		let card = document.createElement("div");
 		card.setAttribute("class", "card");
+		card.setAttribute("data-phone", phone);
+		card.setAttribute("data-address", full_address);
+		card.setAttribute("data-dob", day + "/" + month + "/" + year);
+
 		userlist.push(card);
 		
 		let card_img_container = document.createElement("div");
@@ -58,22 +70,66 @@ const createUser = (users) => {
 		card.appendChild(card_info_container);
 	}
 	for(user of userlist){
+		//appends each user to the page
 		gallery.appendChild(user);
+
+		//adds an event listener to each card that looks for a click 
 		user.addEventListener("click", (event) => {
-			//traversing through these elements like a crazy maniac
-			let image;
+
+			//variables that will be used to display modal info
+			let image, name, email, address, cell, full_addr, dob;
+
+
+			//based on where the user clicked the info will be found through different pathways
 			if(event.target.className == "card-img"){
 				image = event.target.getAttribute("src");
+				name = event.target.parentElement.parentElement.children[1].children[0].innerHTML;
+				email = event.target.parentElement.parentElement.children[1].children[1].innerHTML;
+				address = event.target.parentElement.parentElement.children[1].children[2].innerHTML;
+				cell = event.target.parentElement.parentElement.dataset.phone;
+				full_addr = event.target.parentElement.parentElement.dataset.address;
+				dob = event.target.parentElement.parentElement.dataset.dob;
 			}
 			else if(event.target.className == "card"){
 				image = event.target.children[0].children[0].getAttribute("src");
+				name = event.target.children[1].children[0].innerHTML;
+				email = event.target.children[1].children[1].innerHTML;
+				address = event.target.children[1].children[2].innerHTML;
+				cell = event.target.dataset.phone;
+				full_addr = event.target.dataset.address;
+				dob = event.target.dataset.dob;
+
 			}
 			else if(event.target.className == "card-info-container"){
+				image = event.target.parentElement.children[0].children[0].getAttribute("src");
+				name = event.target.children[0].innerHTML;
+				email = event.target.children[1].innerHTML;
+				address = event.target.children[2].innerHTML;
+				cell = event.target.parentElement.dataset.phone;
+				full_addr = event.target.parentElement.dataset.address;
+				dob = event.target.parentElement.dataset.dob;
+
+			}
+			else if(event.target.className == "card-img-container"){
 				image = event.target.children[0].getAttribute("src");
+				name = event.target.parentElement.children[1].children[0].innerHTML;
+				email = event.target.parentElement.children[1].children[1].innerHTML;
+				address = event.target.parentElement.children[1].children[2].innerHTML;
+				cell = event.target.parentElement.dataset.phone;
+				full_addr = event.target.parentElement.dataset.address;
+				dob = event.target.parentElement.dataset.dob;
 			}
 			else{
 				image = event.target.parentElement.parentElement.children[0].children[0].getAttribute("src");
+				name = event.target.parentElement.parentElement.children[1].children[0].innerHTML;
+				email = event.target.parentElement.parentElement.children[1].children[1].innerHTML;
+				address = event.target.parentElement.parentElement.children[1].children[2].innerHTML;
+				cell = event.target.parentElement.parentElement.dataset.phone;
+				full_addr = event.target.parentElement.parentElement.dataset.address;
+				dob = event.target.parentElement.parentElement.dataset.dob;
 			}
+
+			//generating modal component
 
 			let modal_container = document.createElement("div");
 			modal_container.setAttribute("class", "modal-container");
@@ -115,19 +171,19 @@ const createUser = (users) => {
 			let modal_name_cap = document.createElement("h3");
 			modal_name_cap.setAttribute("id", "name");
 			modal_name_cap.setAttribute("class", "modal-name cap");
-			modal_name_cap.innerHTML = "name";
+			modal_name_cap.innerHTML = name;
 			 
 			modal_info_container.appendChild(modal_name_cap);
 			 
 			let modal_email = document.createElement("p");
 			modal_email.setAttribute("class", "modal-text");
-			modal_email.innerHTML = "email";
+			modal_email.innerHTML = email;
 			 
 			modal_info_container.appendChild(modal_email);
 			 
 			let modal_city = document.createElement("p");
 			modal_city.setAttribute("class", "modal-text cap");
-			modal_city.innerHTML = "city";
+			modal_city.innerHTML = address;
 			 
 			modal_info_container.appendChild(modal_city);
 			 
@@ -137,19 +193,19 @@ const createUser = (users) => {
 			 
 			let modal_phone = document.createElement("p");
 			modal_phone.setAttribute("class", "modal-text");
-			modal_phone.innerHTML = "(555) 555-5555";
+			modal_phone.innerHTML = cell;
 			 
 			modal_info_container.appendChild(modal_phone);
 			 
 			let modal_address = document.createElement("p");
 			modal_address.setAttribute("class", "modal-text");
-			modal_address.innerHTML = "123 Portland Ave., Portland, OR 97204";
+			modal_address.innerHTML = full_addr;
 			 
 			modal_info_container.appendChild(modal_address);
 			 
 			let modal_birthday = document.createElement("p");
 			modal_birthday.setAttribute("class", "modal-text");
-			modal_birthday.innerHTML = "Birthday: 10/21/2015";
+			modal_birthday.innerHTML = dob;
 			 
 			modal_info_container.appendChild(modal_birthday);
 		})
